@@ -73,7 +73,17 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     });
     const shortenedName = await shortenNameResponse.text();
 
-    const quickAddUrl = `${QUICK_ADD_URL}?name=${shortenedName}&image=${image}&shopName=${shop.name}&shopUrl=${shop.url}&link=${data.link}`;
+    const shortenDescriptionResponse = await fetch('https://api.hunterparcells.com/etsy/shorten-description', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Etsy-Key': key
+      },
+      body: JSON.stringify({ description })
+    });
+    const shortenedDescription = await shortenDescriptionResponse.text();
+
+    const quickAddUrl = `${QUICK_ADD_URL}?name=${shortenedName}&image=${image}&shopName=${shop.name}&shopUrl=${shop.url}&description=${shortenedDescription}&link=${data.link}`;
     chrome.tabs.create({ url: quickAddUrl });
   }
 });
