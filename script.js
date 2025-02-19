@@ -1,3 +1,5 @@
+const QUICK_ADD_URL = `http://risingswag.com/admin/quick-add`;
+
 document.getElementById('fetch').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     function fetchData() {
@@ -71,27 +73,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     });
     const shortenedName = await shortenNameResponse.text();
 
-    const date = new Date().toISOString().split('T')[0];
-
-    const string = `,{
-      date: '${date}',
-      image: '${image}',
-      name: '${shortenedName}',
-      tags: [],
-      shop: {
-        name: '${shop.name}',
-        url: '${shop.url}'
-      },
-      description: 'FILL',
-      link: '${data.link}'
-    }`;
-    
-    const textArea = document.createElement('textarea');
-    textArea.classList.add('outputBox');
-    textArea.value = string;
-    textArea.rows = 10;
-    textArea.readOnly = true;
-    output.appendChild(textArea);
-    textArea.select();
+    const quickAddUrl = `${QUICK_ADD_URL}?name=${shortenedName}&image=${image}&shopName=${shop.name}&shopUrl=${shop.url}&link=${data.link}`;
+    chrome.tabs.create({ url: quickAddUrl });
   }
 });
