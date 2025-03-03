@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     const keyResponse = await fetch('MASTER_ETSY_API_KEY.txt');
     const key = await keyResponse.text();
     
-    const shortenNameResponse = await fetch('https://api.hunterparcells.com/etsy/shorten-name', {
+    const shortenNameRequest = await fetch('https://api.hunterparcells.com/etsy/shorten-name', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,9 +71,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       },
       body: JSON.stringify({ name })
     });
-    const shortenedName = await shortenNameResponse.text();
-
-    const shortenDescriptionResponse = await fetch('https://api.hunterparcells.com/etsy/shorten-description', {
+    const shortenDescriptionRequest = await fetch('https://api.hunterparcells.com/etsy/shorten-description', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -81,6 +79,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       },
       body: JSON.stringify({ description })
     });
+
+    const [shortenNameResponse, shortenDescriptionResponse] = await Promise.all([shortenNameRequest, shortenDescriptionRequest])
+
+    const shortenedName = await shortenNameResponse.text();
     const shortenedDescription = await shortenDescriptionResponse.text();
 
     const quickAddUrl = `${QUICK_ADD_URL}?name=${shortenedName}&image=${image}&shopName=${shop.name}&shopUrl=${shop.url}&description=${shortenedDescription}&link=${data.link}`;
